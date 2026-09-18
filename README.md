@@ -47,8 +47,52 @@ On screen, white corner brackets mark the plane, and the strip along the bottom 
 lanes: outlined is the plane's lane, filled is the chosen lane, and the tick below is the exact steering target.
 The text at the top shows the chosen lane and its confidence, the fire probability, the speed and the request time.
 
+### Setup
+
+What you need to run the TypeSafe pilot:
+
+| Requirement | Why | How |
+| --- | --- | --- |
+| Python 3.10+ | `typesafe-sdk` and `pygame-ce` need it | `python3 --version` |
+| `typesafe-sdk` 0.6+ | Python client for the System One API | Installed by `requirements.txt` (see [Run](#run)) |
+| A TypeSafe API key | Every decision is one System One request to Jev | Create one at [console.typesafe.ai](https://console.typesafe.ai) |
+| Network access to `api.typesafe.ai` | Requests go to TypeSafe's hosted API | About 8 requests per second while playing in real time |
+| `ffmpeg` (optional) | Only for `--record` | macOS: `brew install ffmpeg`; Debian/Ubuntu: `sudo apt install ffmpeg` |
+
+1. Install the game and SDK:
+
+   ```sh
+   python3 -m venv .venv
+   .venv/bin/pip install -r requirements.txt
+   ```
+
+2. Set your API key in the shell you run the pilot from (add it to `~/.zshrc` or `~/.bashrc` to keep it):
+
+   ```sh
+   export TYPESAFE_API_KEY="your-key-here"
+   ```
+
+   Don't commit the key. If it's missing, the SDK raises `No API key was provided`; if it's wrong, the pilot exits with `TypeSafe rejected the API key`.
+
+3. Check it works with a short run without a window:
+
+   ```sh
+   .venv/bin/python -m typesafe_pilot --headless --frames 600
+   ```
+
+The SDK uses Jev (`jev-latest`) at `https://api.typesafe.ai` by default. These optional environment
+variables, read by `typesafe-sdk`, change that:
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `TYPESAFE_API_KEY` | (required) | Your API key. Not needed for `--human`. |
+| `TYPESAFE_DEFAULT_MODEL` | `jev-latest` | The System One model to use. |
+| `TYPESAFE_BASE_URL` | `https://api.typesafe.ai` | API root. |
+| `TYPESAFE_LOG_LEVEL` | off | SDK logging, e.g. `debug`. |
+
+### Running the pilot
+
 ```sh
-# typesafe-sdk is in requirements.txt; set TYPESAFE_API_KEY (get one at https://console.typesafe.ai)
 .venv/bin/python -m typesafe_pilot                                  # watch it play in real time
 .venv/bin/python -m typesafe_pilot --lockstep                       # game waits for each decision
 .venv/bin/python -m typesafe_pilot --headless --frames 3000         # no window, prints stats
